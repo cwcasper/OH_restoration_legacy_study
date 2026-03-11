@@ -62,18 +62,21 @@ cov_long<-cover %>%
          LegacySpp = factor(LegacySpp, levels = c("CENSTO", "EUPESU", "POTREC", "BROTEC", "Native")),
          life_form=factor(recode(species, !!!life_form), levels=c("forb","grass")),
          native_status = factor(recode(species, !!!native_status), levels = c("native", "exotic")))
-str(cover)
+
+write.csv(cov_long, "processed_data/cov_long.csv")
+
 ## native, exotic, legacy ----
+## group_cov dataframe represents unweeded, transplanted quadrants with the following functional groups totaled for cover
+## native, original_legacy, exotic_other, and exotic_total
 group_cov <- cover %>% 
   mutate(native_cover = rowSums(across(ACHMIL:PSESPE), na.rm = TRUE)) %>% 
-  select(Block, LegacySpp, year, planting, weeding, BROTEC, CENSTO, EUPESU, POTREC,native_cover,
-         original_legacy_cover, exotic_grass_other, exotic_forb_other, exotic_other_total, exotic_total) %>% 
+  select(Block, Subplot, LegacySpp, year, planting, weeding, native_cover,
+         original_legacy_cover, exotic_other_total, exotic_total) %>% 
   filter(weeding=="C", planting =="T") %>% 
   group_by(LegacySpp, year) %>% 
-  select(Block, LegacySpp, year, native_cover, original_legacy_cover, exotic_other_total, exotic_total) %>% 
+  select(Block, Subplot, LegacySpp, year, native_cover, original_legacy_cover, exotic_other_total, exotic_total) %>% 
   mutate(native_ratio = native_cover / (exotic_total+1))
 str(group_cov)
-
 
 write.csv(group_cov, "processed_data/group_cov.csv")
 
